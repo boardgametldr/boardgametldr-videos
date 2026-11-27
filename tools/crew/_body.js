@@ -34,6 +34,7 @@ function flow(P,mat,az0,el0,az1,el1,{w=0.26,flat=0.45,r0=1.03,r1=1.1,dy=0,curl=0
 function shell(P,mat,{top=0.5,backTo=0.7,frontCut=60,r=1.035,sy=1}={}){ // 큰 덩어리
   mat=P.hairM?P.hairM.shell:mat;const a=add(new THREE.SphereGeometry(r,64,40,0,Math.PI*2,0,Math.PI*top),mat,P.head);a.scale.y=sy;
   if(backTo>top){const b=add(new THREE.SphereGeometry(r,64,40,Math.PI/2+frontCut*D,Math.PI*2-2*frontCut*D,Math.PI*top-0.02,Math.PI*(backTo-top)),mat,P.head);b.scale.y=sy;}
+  {const cm=mat.clone();cm.userData={outlineParameters:{visible:false}};const cc=add(new THREE.SphereGeometry(r+0.065,48,12,0,Math.PI*2,0,Math.PI*0.15),cm,P.head);cc.scale.y=sy;} // 정수리 덮개: 가닥 뿌리가 튀어나와 보이지 않게
   P.hair.visible=false;}
 
 // ---- 몸 ----
