@@ -25,6 +25,7 @@ function mkLeo(){const d=CREW_DEF.leo;const P=person3({top:d.hood,topDark:0xE060
     flow(P,m,sx*34*D,85*D,sx*70*D,14*D,{w:0.2,flat:0.4,r0:0.99,r1:1.07,curl:0.02,n:7});}
   // 윗머리 (정수리에서 사방으로, 끝이 살짝 뻗침)
   for(let az=-165;az<180;az+=30)flow(P,m,az*0.3*D,87*D,az*D,38*D,{w:0.3,flat:0.48,r0:1.0,r1:1.12,curl:0.07,n:6});
+  {const cm=P.hairM.shell.clone();cm.userData={outlineParameters:{visible:false}};add(new THREE.SphereGeometry(1.165,40,10,0,Math.PI*2,0,Math.PI*0.1),cm,P.head);} // 정수리 가운데 빈 곳 채움
   // 앞머리 (눈썹 위까지, 끝 뾰족)
   [-40,-21,-3,15,33].forEach((az,i)=>flow(P,m,(az*0.3)*D,85*D,az*1.05*D,(24+(i%2)*4)*D,{w:0.26,flat:0.42,r0:0.99,r1:1.09,curl:0.03,n:7}));
   // 주사위 목걸이

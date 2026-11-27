@@ -8,7 +8,7 @@ function lockGeo(pts,r,flat=0.5,blunt=false,seg=26,rad=12){
   const curve=new THREE.CatmullRomCurve3(pts,false,'centripetal');const pos=[],idx=[],nor=[],uv=[];
   for(let i=0;i<=seg;i++){const t=i/seg;const P=curve.getPointAt(t),T=curve.getTangentAt(t).normalize();
     let O=P.clone().sub(new THREE.Vector3(0,0.05,0));O.sub(T.clone().multiplyScalar(O.dot(T))).normalize();const Wd=new THREE.Vector3().crossVectors(T,O).normalize();
-    let f=blunt?(t<0.9?0.85+0.15*Math.sin(Math.min(1,t/0.25)*Math.PI/2):Math.sqrt(Math.max(0,1-(t-0.9)/0.1))*1.0):(t<0.18?0.7+0.3*Math.sin(t/0.18*Math.PI/2):Math.max(0.012,Math.pow(1-(t-0.18)/0.82,0.8)));
+    let f=blunt?(t<0.9?0.3+0.7*Math.sin(Math.min(1,t/0.25)*Math.PI/2):Math.sqrt(Math.max(0,1-(t-0.9)/0.1))*1.0):(t<0.18?0.25+0.75*Math.sin(t/0.18*Math.PI/2):Math.max(0.012,Math.pow(1-(t-0.18)/0.82,0.8)));
     for(let j=0;j<=rad;j++){const a=j/rad*Math.PI*2;const v=P.clone().addScaledVector(Wd,Math.cos(a)*r*f).addScaledVector(O,Math.sin(a)*r*f*flat);pos.push(v.x,v.y,v.z);const nn=new THREE.Vector3().addScaledVector(Wd,Math.cos(a)*flat).addScaledVector(O,Math.sin(a)).normalize();if(blunt&&t>0.92)nn.lerp(T,(t-0.92)/0.08*0.6).normalize();nor.push(nn.x,nn.y,nn.z);uv.push(j/rad,t);}}
   for(let i=0;i<seg;i++)for(let j=0;j<rad;j++){const a=i*(rad+1)+j,b=a+rad+1;idx.push(a,b,a+1,b,b+1,a+1);}
   const e=curve.getPointAt(1).addScaledVector(curve.getTangentAt(1),r*0.04),s0=curve.getPointAt(0).addScaledVector(curve.getTangentAt(0),-r*0.3);const ce=pos.length/3;pos.push(e.x,e.y,e.z,s0.x,s0.y,s0.z);{const t1=curve.getTangentAt(1),t0=curve.getTangentAt(0);nor.push(t1.x,t1.y,t1.z,-t0.x,-t0.y,-t0.z);uv.push(0.5,1,0.5,0);}
@@ -34,7 +34,6 @@ function flow(P,mat,az0,el0,az1,el1,{w=0.26,flat=0.45,r0=1.03,r1=1.1,dy=0,curl=0
 function shell(P,mat,{top=0.5,backTo=0.7,frontCut=60,r=1.035,sy=1}={}){ // 큰 덩어리
   mat=P.hairM?P.hairM.shell:mat;const a=add(new THREE.SphereGeometry(r,64,40,0,Math.PI*2,0,Math.PI*top),mat,P.head);a.scale.y=sy;
   if(backTo>top){const b=add(new THREE.SphereGeometry(r,64,40,Math.PI/2+frontCut*D,Math.PI*2-2*frontCut*D,Math.PI*top-0.02,Math.PI*(backTo-top)),mat,P.head);b.scale.y=sy;}
-  {const cm=mat.clone();cm.userData={outlineParameters:{visible:false}};const cc=add(new THREE.SphereGeometry(r+0.065,48,12,0,Math.PI*2,0,Math.PI*0.15),cm,P.head);cc.scale.y=sy;} // 정수리 덮개: 가닥 뿌리가 튀어나와 보이지 않게
   P.hair.visible=false;}
 
 // ---- 몸 ----
