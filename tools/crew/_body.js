@@ -8,8 +8,8 @@ function lockGeo(pts,r,flat=0.5,blunt=false,seg=26,rad=12){
   const curve=new THREE.CatmullRomCurve3(pts,false,'centripetal');const pos=[],idx=[],nor=[],uv=[];
   for(let i=0;i<=seg;i++){const t=i/seg;const P=curve.getPointAt(t),T=curve.getTangentAt(t).normalize();
     let O=P.clone().sub(new THREE.Vector3(0,0.05,0));O.sub(T.clone().multiplyScalar(O.dot(T))).normalize();const Wd=new THREE.Vector3().crossVectors(T,O).normalize();
-    let f=blunt?(t<0.9?0.85+0.15*Math.sin(Math.min(1,t/0.25)*Math.PI/2):Math.sqrt(Math.max(0,1-(t-0.9)/0.1))*1.0):(t<0.18?0.7+0.3*Math.sin(t/0.18*Math.PI/2):Math.max(0.1,Math.pow(1-(t-0.18)/0.82,0.8)));
-    for(let j=0;j<=rad;j++){const a=j/rad*Math.PI*2;const v=P.clone().addScaledVector(Wd,Math.cos(a)*r*f).addScaledVector(O,Math.sin(a)*r*f*flat);pos.push(v.x,v.y,v.z);const nn=new THREE.Vector3().addScaledVector(Wd,Math.cos(a)*flat).addScaledVector(O,Math.sin(a)).normalize();if(t>0.92)nn.lerp(T,(t-0.92)/0.08*0.6).normalize();nor.push(nn.x,nn.y,nn.z);uv.push(j/rad,t);}}
+    let f=blunt?(t<0.9?0.85+0.15*Math.sin(Math.min(1,t/0.25)*Math.PI/2):Math.sqrt(Math.max(0,1-(t-0.9)/0.1))*1.0):(t<0.18?0.7+0.3*Math.sin(t/0.18*Math.PI/2):Math.max(0.012,Math.pow(1-(t-0.18)/0.82,0.8)));
+    for(let j=0;j<=rad;j++){const a=j/rad*Math.PI*2;const v=P.clone().addScaledVector(Wd,Math.cos(a)*r*f).addScaledVector(O,Math.sin(a)*r*f*flat);pos.push(v.x,v.y,v.z);const nn=new THREE.Vector3().addScaledVector(Wd,Math.cos(a)*flat).addScaledVector(O,Math.sin(a)).normalize();if(blunt&&t>0.92)nn.lerp(T,(t-0.92)/0.08*0.6).normalize();nor.push(nn.x,nn.y,nn.z);uv.push(j/rad,t);}}
   for(let i=0;i<seg;i++)for(let j=0;j<rad;j++){const a=i*(rad+1)+j,b=a+rad+1;idx.push(a,b,a+1,b,b+1,a+1);}
   const e=curve.getPointAt(1).addScaledVector(curve.getTangentAt(1),r*0.04),s0=curve.getPointAt(0).addScaledVector(curve.getTangentAt(0),-r*0.3);const ce=pos.length/3;pos.push(e.x,e.y,e.z,s0.x,s0.y,s0.z);{const t1=curve.getTangentAt(1),t0=curve.getTangentAt(0);nor.push(t1.x,t1.y,t1.z,-t0.x,-t0.y,-t0.z);uv.push(0.5,1,0.5,0);}
   for(let j=0;j<rad;j++){const a=seg*(rad+1)+j;idx.push(a,a+1,ce);idx.push(j+1,j,ce+1);}
@@ -20,7 +20,7 @@ function hairTexCanvas(col){const c=document.createElement('canvas');c.width=512
   for(let i=0;i<46;i++){const x=rr()*512,w=1+rr()*4;g.fillStyle='#'+dk.getHexString();g.globalAlpha=0.35+rr()*0.3;g.fillRect(x,0,w,16);}
   for(let i=0;i<22;i++){const x=rr()*512,w=1+rr()*2;g.fillStyle='#'+lt.getHexString();g.globalAlpha=0.25;g.fillRect(x,0,w,16);}
   return c;}
-function hairMats(col){const c=hairTexCanvas(col);const mk=(rx)=>{const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rx,1);t.anisotropy=8;return new THREE.MeshStandardMaterial({map:t,roughness:.5});};
+function hairMats(col){const c=hairTexCanvas(col);const mk=(rx)=>{const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rx,1);t.anisotropy=8;return new THREE.MeshStandardMaterial({map:t,roughness:.5,side:THREE.DoubleSide});};
   return {lock:mk(1),shell:mk(6)};}
 function lock(P,mat,pts,r,flat,blunt){return add(lockGeo(pts.map(p=>p.isVector3?p:new THREE.Vector3(...p)),r,flat,blunt),mat,P.head);}
 // 두피 위를 따라 흐르는 가닥: (az0,el0)→(az1,el1), 반경 r0→r1, 끝에서 dy만큼 더 내려감
